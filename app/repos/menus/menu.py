@@ -1,10 +1,17 @@
 from sqlmodel import SQLModel, Field
 from sqlalchemy import JSON
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 # Helpers
 from app.helpers.convert_date_to_str import convert_datetime_to_str
+
+class DishBaseSchema(SQLModel):
+    dish_name: str
+    dish_description: str
+    dish_price: float 
+    dish_discount: Optional[float]= 0.0
+    dish_category: List[str] = []
 
 class Menu(SQLModel, table=True):
     """
@@ -20,9 +27,11 @@ class Menu(SQLModel, table=True):
     """
     menu_id: str = Field(primary_key=True, index=True)
     menu_title: str
-    menu_description: str = Field(default="", min_length=0, max_length=500)
+    menu_description: str = Field(min_length=0, max_length=500)
     restaurant_id: str 
     created_at: str = Field(default=convert_datetime_to_str(datetime.utcnow()), index=True)
-    dishes: List = Field(default=[], sa_type=JSON)
+    updated_at: Optional[str] = Field(default=None, index=True)
+    dishes: List[DishBaseSchema] = Field(default_factory=list, sa_type=JSON)
+
 
 
