@@ -32,6 +32,7 @@ class Menu(SQLModel, table=True):
     created_at: str = Field(default=convert_datetime_to_str(datetime.utcnow()), index=True)
     updated_at: Optional[str] = Field(default=None, index=True)
     dishes: List[DishBaseSchema] = Field(default_factory=list, sa_type=JSON)
+    created_at: str = Field(default=convert_datetime_to_str(datetime.utcnow()), index=True)
 
 
 
