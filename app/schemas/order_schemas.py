@@ -30,12 +30,12 @@ class OrderBaseSchema(BaseModel):
     is_approved_by_restaurant: bool
     approved_at: Optional[str] = None
     order_status: Optional[OrderStatusEnum] = None
-    orders: List[Dict[OrderItemSchema]]
-    restaurant: Dict[RestaurantSchema]
-    user: Dict[UserSchema]
+    orders: List[OrderItemSchema]
+    restaurant: RestaurantSchema
+    user: UserSchema
 
-class CreateOrderSchema(BaseModel):
-    orders: List[Dict[OrderItemSchema]]
-    restaurant: Dict[RestaurantSchema]
-    user: Dict[UserSchema]
+class OrderCreateSchema(BaseModel):
+    orders: List[OrderItemSchema]
+    restaurant: RestaurantSchema
+    user: UserSchema
     

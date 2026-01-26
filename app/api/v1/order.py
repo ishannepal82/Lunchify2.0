@@ -21,8 +21,17 @@ def get_all_orders(db: Session = Depends(get_session)):
     pass
 
 @order_router.post("/create/order")
-def create_order(): 
+def create_order(
+    order: OrderCreateSchema,
+    db: Session = Depends(get_session))-> JSONResponse: 
     """
     Docstring for create_order
     """
-    pass
+    try: 
+        service = OrderService(db)
+        resp: OrderBaseSchema = service.create_order(order)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    return JSONResponse(content={"order": resp}, status_code=201)
