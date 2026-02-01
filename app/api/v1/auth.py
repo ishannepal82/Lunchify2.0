@@ -6,7 +6,7 @@ from app.services.auth.login_service import LoginService
 from app.services.auth.registration_service import RegistrationService
 
 # Schemas
-from app.schemas.user_schemas import UserCreateSchema, UserResponseSchema
+from app.schemas.user_schemas import UserCreateSchema, UserResponseSchema, UserLoginRequestSchema
 
 # Sessions
 from app.db.sessions import get_session
@@ -14,8 +14,18 @@ from app.db.sessions import get_session
 auth_router = APIRouter()
 
 @auth_router.post('/login')
-def login(db = Depends(get_session)):
-    pass
+def login(data: UserLoginRequestSchema, db = Depends(get_session)):
+    try: 
+        service = LoginService(db)
+        resp = service.login_user(data)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail=str(ve))
+    
+    return JSONResponse(content={"token": resp}, status_code=201)
 
 @auth_router.post('/logout')
 def logout():

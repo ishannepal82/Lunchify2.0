@@ -1,6 +1,6 @@
 
 # Helpers
-from app.helpers.internal.hash_password import hash_password
+from app.helpers.hash_password import hash_password
 from app.helpers.convert_date_to_str import convert_datetime_to_str
 
 # Repos

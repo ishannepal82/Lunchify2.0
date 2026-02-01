@@ -36,3 +36,8 @@ class UserResponseSchema(BaseModel):
     name: str
     order_history: Optional[list[OrderHistoryItemSchema]] = []
 
+class UserLoginRequestSchema(BaseModel):
+    contact: ContactSchema
+    password: str 
+
+
