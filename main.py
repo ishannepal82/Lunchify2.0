@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from app.db import create_all_db_tables
 from app.api.v1.menu import menu_router
 from app.api.v1.order import order_router
+from app.api.v1.auth import auth_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -30,6 +31,11 @@ app.include_router(
 app.include_router(
     prefix="/api/v1/orders",
     router=order_router
+)
+
+app.include_router(
+    prefix="/api/v1/auth",
+    router=auth_router
 )
 
 
