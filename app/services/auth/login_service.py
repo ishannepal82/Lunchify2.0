@@ -18,7 +18,6 @@ class LoginService():
             user = self.db.exec(
             select(User).where(User.contact['email'].as_string()  == data.contact.email)
             ).first()
-            print(user)
             """
             Check wether the password that user has entred is correct or not 
             and also check if the user exists or not 
@@ -26,10 +25,10 @@ class LoginService():
             if not user or not check_password(data.password, user.hashed_password):
                 raise ValueError("Invalid email or password.")
             
-            access_token = create_access_token(
-                data={"sub": str(user.user_id)}
-            )
-            
+            access_token = create_access_token( data={"sub": str(user.user_id), 
+                      "role": "user"
+                      })
+          
         except Exception as e:
             raise e
         

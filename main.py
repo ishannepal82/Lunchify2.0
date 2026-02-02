@@ -5,6 +5,7 @@ from app.db import create_all_db_tables
 from app.api.v1.menu import menu_router
 from app.api.v1.order import order_router
 from app.api.v1.auth import auth_router
+from app.middlewares.auth_middlware import AuthMiddlware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -22,6 +23,8 @@ app = FastAPI(
     version="v1",
     lifespan=lifespan
 )
+
+app.add_middleware(AuthMiddlware)
 
 app.include_router(
     prefix="/api/v1/menus", 
