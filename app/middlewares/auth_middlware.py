@@ -1,47 +1,58 @@
-# Middlewares 
 from starlette.middleware.base import BaseHTTPMiddleware
-
-# FastAPI
-from fastapi.responses import JSONResponse
 from fastapi import Request
+from fastapi.responses import JSONResponse
 
-# JWT 
-from jose import jwt 
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTError
 
-# CORE 
 from app.core.config import settings
 
-class AuthMiddlware(BaseHTTPMiddleware):
-    """
-    Docstring for AuthMiddlware
 
-    :param BaseHTTPMiddleware:
-    :info: Authentication for users
+class AuthMiddleware(BaseHTTPMiddleware):
     """
-    def dispatch(self, request, call_next):
+    JWT authentication middleware.
+    """
+
+    async def dispatch(self, request: Request, call_next):
+        # Optional: exclude public routes
+        if request.url.path in {"/docs", "/openapi.json", "/health"}:
+            return await call_next(request)
+
         auth_header = request.headers.get("Authorization")
 
         if not auth_header or not auth_header.startswith("Bearer "):
-            return JSONResponse(status_code=401, content={"detail": "Missing token"})
-        
-        token = auth_header.split(" ")[1]
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Missing or invalid Authorization header"},
+            )
+
+        token = auth_header.split(" ", 1)[1]
 
         try:
             payload = jwt.decode(
                 token,
                 settings.SECRET_KEY,
-                algorithms=[settings.ALGORITHM]
+                algorithms=[settings.ALGORITHM],
             )
-            
-            # Add actor to request 
+
+            sub = payload.get("sub")
+            role = payload.get("role")
+
+            if not sub or not role:
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "Invalid token payload"},
+                )
+
+            # Attach actor to request state
             request.state.actor = {
-                "id": payload["sub"],
-                "role": payload["role"],
+                "id": sub,
+                "role": role,
             }
 
-        except jwt.ExpiredSignatureError:
+        except ExpiredSignatureError:
             return JSONResponse(status_code=401, content={"detail": "Token expired"})
-        except jwt.InvalidTokenError:
+        except JWTError:
             return JSONResponse(status_code=401, content={"detail": "Invalid token"})
-        
-        return call_next(request)
+
+        return await call_next(request)
