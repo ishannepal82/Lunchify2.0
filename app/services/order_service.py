@@ -36,3 +36,29 @@ class OrderService():
         except Exception as e:
             raise e  
         return order_db.model_dump(exclude_unset=True)
+    
+    def get_all_orders(self): 
+        try: 
+            orders = self.db.exec(select(Order)).all()
+            orders_dict = [order.model_dump() for order in orders]
+
+        except Exception as e: 
+            print(f"Error in : {e}")
+
+        return orders_dict
+    
+    def approve_order (self, order_id): 
+        try: 
+           order_db = self.db.get(Order, order_id)
+
+           if not order_db:
+               raise ValueError("Order nto found")
+           
+           print(order_db)
+           order_db.is_approved_by_restaurant = True
+           self.db.commit()
+
+        except Exception as e: 
+            print(f"Error in : {e}")
+
+        return self 

@@ -1,9 +1,8 @@
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, JSON
 from datetime import datetime
 from typing import List
 from uuid import uuid4
-
 # Helpers
 from app.helpers.convert_date_to_str import convert_datetime_to_str
 
@@ -30,12 +29,7 @@ class User(SQLModel, table=True):
     contact: ContactsSchema = Field(sa_column=Column(JSON))
     address: AddressSchema = Field(sa_column=Column(JSON))
 
-    hashed_password: str = Field(nullable=False)
-
-    order_history: List[dict] = Field(
-        default_factory=list,
-        sa_column=Column(JSON)
-    )
+    hashed_password: str = Field(nullable=False) 
 
     created_at: str = Field(
         default_factory=lambda: convert_datetime_to_str(datetime.utcnow()),
@@ -46,3 +40,5 @@ class User(SQLModel, table=True):
         default_factory=lambda: convert_datetime_to_str(datetime.utcnow()),
         index=True
     )
+
+    order_history: List["Order"] = Relationship(back_populates="user")

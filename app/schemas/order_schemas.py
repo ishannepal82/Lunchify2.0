@@ -27,7 +27,7 @@ class OrderStatusEnum(BaseModel):
 class OrderBaseSchema(BaseModel):
     order_id: str 
     total_price: float 
-    is_approved_by_restaurant: bool
+    is_approved_by_restaurant: bool = False
     approved_at: Optional[str] = None
     order_status: Optional[OrderStatusEnum] = None
     orders: List[OrderItemSchema]
@@ -38,4 +38,9 @@ class OrderCreateSchema(BaseModel):
     orders: List[OrderItemSchema]
     restaurant: RestaurantSchema
     user: UserSchema
+
+class OrderApproveSchema(BaseModel): 
+    is_approved_by_restaurant: bool 
+    
+
     

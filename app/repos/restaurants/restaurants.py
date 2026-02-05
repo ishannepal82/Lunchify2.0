@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Column, JSON
+from sqlmodel import SQLModel, Field, Column, JSON, Relationship
 from typing import List
 from datetime import datetime
 
@@ -22,6 +22,6 @@ class Restaurant(SQLModel, table=True):
     contact: ContactsSchema = Field(sa_column=Column(JSON))
     address: AddressSchema = Field(sa_column=Column(JSON))
     category: List[str] = Field(sa_column=Column(JSON))
-    delivery_history: List[dict] = Field(default_factory=list,sa_column=Column(JSON))
+    orders: List["Order"] = Relationship(back_populates="restaurant")
     created_at: str = Field(default=convert_datetime_to_str(datetime.utcnow()), index=True)
 
