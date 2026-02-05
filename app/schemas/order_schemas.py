@@ -39,8 +39,7 @@ class OrderCreateSchema(BaseModel):
     restaurant: RestaurantSchema
     user: UserSchema
 
-class OrderApproveSchema(BaseModel): 
-    is_approved_by_restaurant: bool 
+
     
 
     

@@ -24,7 +24,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.add_middleware(AuthMiddleware)
+# app.add_middleware(AuthMiddleware)
 
 app.include_router(
     prefix="/api/v1/menus", 

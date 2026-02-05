@@ -27,13 +27,28 @@ class OrderService():
             order_db = Order(
                 order_id = str(uuid4()),
                 total_price= total_price,
-                created_at = datetime.utcnow(),**order.model_dump())
+                created_at = datetime.utcnow(),
+                user_id=order_dict["user"]["user_id"],
+                restaurant_id=order_dict["restaurant"]["restaurant_id"],
+
+                user_snapshot={
+                "name": order_dict["user"]["name"],
+                "phone": order_dict["user"]["phone"],
+                "address": order_dict["user"]["address"],
+                },
+             restaurant_snapshot={
+                "name": order_dict["restaurant"]["name"],
+                "address": order_dict["restaurant"]["address"],
+                "phone": order_dict["restaurant"]["phone"],
+                },
+              order_items=order_dict["orders"])
 
             self.db.add(order_db)
             self.db.commit()
             self.db.refresh(order_db)
 
         except Exception as e:
+            print(e)
             raise e  
         return order_db.model_dump(exclude_unset=True)
     
