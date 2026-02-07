@@ -1,6 +1,9 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from typing import Optional, List, Dict, Any
+from sqlmodel import SQLModel, Field
 from enum import Enum
+from datetime import datetime
+from sqlalchemy import Column, JSON
+from decimal import Decimal
 
 
 class OrderStatusEnum(str, Enum):
@@ -9,38 +12,32 @@ class OrderStatusEnum(str, Enum):
     COMPLETED = "COMPLETED"
 
 
-class OrderItemSchema(BaseModel):
-    item_name: str
-    item_quantity: int
-    item_price: float
-    item_discount: Optional[float] = 0.0
+class Order(SQLModel, table=True):
+    __tablename__ = "orders"
 
+    order_id: str = Field(primary_key=True, index=True)
 
-class UserSnapshotSchema(BaseModel):
-    name: str
-    phone: str
-    address: str
+    total_price: Decimal
 
-
-class RestaurantSnapshotSchema(BaseModel):
-    name: str
-    address: str
-    phone: str
-
-
-class OrderBaseSchema(BaseModel):
-    order_id: str
-    total_price: float
-    is_approved_by_restaurant: bool = False
-    approved_at: Optional[str] = None
+    is_approved_by_restaurant: bool = Field(default=False)
+    approved_at: Optional[datetime] = None
     status: Optional[OrderStatusEnum] = None
-    order_items: List[OrderItemSchema]
-    user_snapshot: UserSnapshotSchema
-    restaurant_snapshot: RestaurantSnapshotSchema
     approval_otp: Optional[str] = None
 
+    order_items: List[Dict[str, Any]] = Field(
+        sa_column=Column(JSON, nullable=False)
+    )
 
-class OrderCreateSchema(BaseModel):
-    order_items: List[OrderItemSchema]
-    user_snapshot: UserSnapshotSchema
-    restaurant_snapshot: RestaurantSnapshotSchema
+    user_id: int = Field(foreign_key="user.user_id")
+
+    user_snapshot: Dict[str, Any] = Field(
+        sa_column=Column(JSON, nullable=False)
+    )
+
+    restaurant_id: int = Field(foreign_key="restaurant.restaurant_id")
+
+    restaurant_snapshot: Dict[str, Any] = Field(
+        sa_column=Column(JSON, nullable=False)
+    )
+
+    created_at: datetime = Field(default_factory=datetime.utcnow)

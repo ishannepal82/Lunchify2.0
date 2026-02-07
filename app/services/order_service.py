@@ -34,11 +34,13 @@ class OrderService():
                 "phone": order_dict["user"]["phone"],
                 "address": order_dict["user"]["address"],
                 },
+
              restaurant_snapshot={
                 "name": order_dict["restaurant"]["name"],
                 "address": order_dict["restaurant"]["address"],
                 "phone": order_dict["restaurant"]["phone"],
                 },
+                
 
               order_items=order_dict["orders"])
 
