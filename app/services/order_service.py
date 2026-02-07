@@ -28,8 +28,6 @@ class OrderService():
                 order_id = str(uuid4()),
                 total_price= total_price,
                 created_at = datetime.utcnow(),
-                user_id=order_dict["user"]["user_id"],
-                restaurant_id=order_dict["restaurant"]["restaurant_id"],
 
                 user_snapshot={
                 "name": order_dict["user"]["name"],
@@ -41,6 +39,7 @@ class OrderService():
                 "address": order_dict["restaurant"]["address"],
                 "phone": order_dict["restaurant"]["phone"],
                 },
+
               order_items=order_dict["orders"])
 
             self.db.add(order_db)
@@ -67,7 +66,7 @@ class OrderService():
            order_db = self.db.get(Order, order_id)
 
            if not order_db:
-               raise ValueError("Order nto found")
+               raise ValueError("Order not found")
            
            print(order_db)
            order_db.is_approved_by_restaurant = True

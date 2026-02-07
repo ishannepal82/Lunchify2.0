@@ -5,12 +5,13 @@ from fastapi.responses import JSONResponse
 from app.schemas.order_schemas import OrderBaseSchema, OrderCreateSchema
 from sqlmodel import Session
 
-# Database Dependencies 
+# Dependencies 
 from app.db.sessions import get_session
+from app.helpers.role_checker import require_role
+
 
 # Services 
 from app.services.order_service import OrderService
-
 
 order_router = APIRouter()
 @order_router.get("/orders")
@@ -30,7 +31,9 @@ def get_all_orders(db: Session = Depends(get_session)):
 @order_router.post("/create/order")
 def create_order(
     order: OrderCreateSchema,
-    db: Session = Depends(get_session))-> JSONResponse: 
+    role: Session = Depends(require_role("user")),
+    db: Session = Depends(get_session)
+    )-> JSONResponse: 
     """
     Docstring for create_order
     """
@@ -46,6 +49,7 @@ def create_order(
 @order_router.put("/approve/order")
 def approve_order(
     order_id = Query(None, alias="order_id"),
+    role: Session = Depends(require_role('users')),
     db: Session = Depends(get_session))-> JSONResponse: 
     """
     Docstring for approve_order

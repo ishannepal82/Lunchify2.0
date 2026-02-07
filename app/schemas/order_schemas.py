@@ -38,8 +38,3 @@ class OrderCreateSchema(BaseModel):
     orders: List[OrderItemSchema]
     restaurant: RestaurantSchema
     user: UserSchema
-
-
-    
-
-    
