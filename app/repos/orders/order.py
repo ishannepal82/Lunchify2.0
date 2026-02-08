@@ -33,13 +33,15 @@ class Order(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.user_id")
 
-    user: Optional["User"] = Relationship(back_populates="orders")
+    user: Optional["User"] = Relationship(back_populates="order_history")
 
     user_snapshot: Dict[str, Any] = Field(
         sa_column=Column(JSON, nullable=False)
     )
 
     restaurant_id: int = Field(foreign_key="restaurant.restaurant_id")
+
+    restaurant: Optional["Restaurant"] = Relationship(back_populates="orders")
 
     restaurant_snapshot: Dict[str, Any] = Field(
         sa_column=Column(JSON, nullable=False)

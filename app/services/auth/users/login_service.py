@@ -22,6 +22,7 @@ class LoginService():
             Check wether the password that user has entred is correct or not 
             and also check if the user exists or not 
             """
+            print(user)
             if not user or not check_password(data.password, user.hashed_password):
                 raise ValueError("Invalid email or password.")
             
