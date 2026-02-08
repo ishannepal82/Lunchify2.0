@@ -1,6 +1,6 @@
-from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi import Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTError
@@ -10,12 +10,21 @@ from app.core.config import settings
 
 class AuthMiddleware(BaseHTTPMiddleware):
     """
-    JWT authentication middleware.
+    JWT Authentication Middleware
     """
 
     async def dispatch(self, request: Request, call_next):
-        # Optional: exclude public routes
-        if request.url.path in {"/docs", "/openapi.json", "/health"}:
+        PUBLIC_PATHS = (
+            "/docs",
+            "/openapi.json",
+            "/health",
+            "/api/v1/auth",
+        )
+
+        path = request.url.path
+
+        # Skip auth for public routes
+        if path.startswith(PUBLIC_PATHS):
             return await call_next(request)
 
         auth_header = request.headers.get("Authorization")
@@ -44,15 +53,21 @@ class AuthMiddleware(BaseHTTPMiddleware):
                     content={"detail": "Invalid token payload"},
                 )
 
-            # Attach actor to request state
+            # Attach authenticated user to request
             request.state.actor = {
                 "id": sub,
                 "role": role,
             }
 
         except ExpiredSignatureError:
-            return JSONResponse(status_code=401, content={"detail": "Token expired"})
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Token expired"},
+            )
         except JWTError:
-            return JSONResponse(status_code=401, content={"detail": "Invalid token"})
+            return JSONResponse(
+                status_code=401,
+                content={"detail": "Invalid token"},
+            )
 
         return await call_next(request)

@@ -1,9 +1,12 @@
 from typing import Optional, List, Dict, Any
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
 from enum import Enum
 from datetime import datetime
 from sqlalchemy import Column, JSON
 from decimal import Decimal
+
+# Helpers
+from app.helpers.convert_date_to_str import convert_datetime_to_str
 
 
 class OrderStatusEnum(str, Enum):
@@ -30,6 +33,8 @@ class Order(SQLModel, table=True):
 
     user_id: int = Field(foreign_key="user.user_id")
 
+    user: Optional["User"] = Relationship(back_populates="orders")
+
     user_snapshot: Dict[str, Any] = Field(
         sa_column=Column(JSON, nullable=False)
     )
@@ -40,4 +45,4 @@ class Order(SQLModel, table=True):
         sa_column=Column(JSON, nullable=False)
     )
 
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: str = Field(default=convert_datetime_to_str(datetime.utcnow()), index=True)
