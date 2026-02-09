@@ -38,7 +38,7 @@ class Order(SQLModel, table=True):
     user_snapshot: Dict[str, Any] = Field(
         sa_column=Column(JSON, nullable=False)
     )
-
+    
     restaurant_id: int = Field(foreign_key="restaurant.restaurant_id")
 
     restaurant: Optional["Restaurant"] = Relationship(back_populates="orders")

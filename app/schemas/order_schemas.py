@@ -36,5 +36,5 @@ class OrderBaseSchema(BaseModel):
 
 class OrderCreateSchema(BaseModel):
     orders: List[OrderItemSchema]
-    restaurant: RestaurantSchema
-    user: UserSchema
+    user_id: str
+    restaurant_id: str 

@@ -7,6 +7,12 @@ from sqlmodel import select
 
 # Helpers
 from app.helpers.internal.calculate_total_price import calculate_total_price
+from app.helpers.convert_date_to_str import convert_datetime_to_str
+
+# Schemas
+from app.repos.restaurants.restaurants import Restaurant
+from app.repos.users.users import User
+from app.schemas.order_schemas import OrderItemSchema
 
 class OrderService(): 
     def __init__(self, db):
@@ -24,25 +30,45 @@ class OrderService():
 
             total_price  = calculate_total_price(order_dict['orders'])
 
+            order_items = [
+                OrderItemSchema(
+                    product_id=item["item_name"],
+                    quantity=item["item_quantity"],
+                    price=item["item_price"],
+                    discount=item.get("item_discount", 0.0)
+                )
+                for item in order_dict["orders"]
+            ]
+
+            user = self.db.get(User, order_dict["user_id"])
+            if not user:
+                raise ValueError("User not found")
+            
+            restaurant = self.db.get(Restaurant, order_dict["restaurant_id"])
+            if not restaurant:
+                raise ValueError("Restaurant not found")
+            
+            user_snapshot = {
+                "name": user.name,
+                "contact": user.contact,
+                "address": user.address
+            }
+
+            restaurant_snapshot = {
+                "name": restaurant.name,
+                "contact": restaurant.contact,
+                "address": restaurant.address
+            }
+
             order_db = Order(
                 order_id = str(uuid4()),
                 total_price= total_price,
-                created_at = datetime.utcnow(),
-
-                user_snapshot={
-                "name": order_dict["user"]["name"],
-                "phone": order_dict["user"]["phone"],
-                "address": order_dict["user"]["address"],
-                },
-
-             restaurant_snapshot={
-                "name": order_dict["restaurant"]["name"],
-                "address": order_dict["restaurant"]["address"],
-                "phone": order_dict["restaurant"]["phone"],
-                },
-                
-
-              order_items=order_dict["orders"])
+                created_at = convert_datetime_to_str(datetime.utcnow()),
+                order_items = order_items,
+                user_snapshot=user_snapshot,
+                restaurant_snapshot=restaurant_snapshot,
+                user_id = user.user_id,
+                restaurant_id= restaurant.restaurant_id)
 
             self.db.add(order_db)
             self.db.commit()
